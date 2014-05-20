@@ -10,7 +10,9 @@ class Application extends BaseApplication
     const CONFIG_FILE = 'daze.yml';
     
     protected $root;
-    protected $config;
+    protected $config = array(
+        'entriesPath' => '.daze/entries'
+    );
     
     /**
      * @return array An array of default Command instances
@@ -20,6 +22,7 @@ class Application extends BaseApplication
         $commands = parent::getDefaultCommands();
 
         $commands[] = new Command\Init();
+        $commands[] = new Command\Build();
 
         return $commands;
     }
@@ -62,5 +65,27 @@ class Application extends BaseApplication
             $yaml = Yaml::dump($config);
             file_put_contents($this->getRoot() .'/'. self::CONFIG_FILE, $yaml);
         }
+    }
+    
+    public function getEntriesPath()
+    {
+        return $this->getRoot() .'/'. $this->config['entriesPath'];
+    }
+
+    /**
+     * 
+     * @return Entry[]
+     */
+    public function getEntries()
+    {
+        $directory  = new \RecursiveDirectoryIterator($this->getEntriesPath(), \FilesystemIterator::FOLLOW_SYMLINKS | \FilesystemIterator::SKIP_DOTS);
+        $iterator   = new \RecursiveIteratorIterator($directory);
+
+        $entries    = array();
+        foreach ($iterator as $info) {
+            $entries[] = Entry::load($info->getPathname());
+        }
+
+        return $entries;
     }
 }

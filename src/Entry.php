@@ -65,4 +65,29 @@ class Entry extends \ArrayObject
         $content    = sprintf("---\n%s---\n%s", $meta, $this->getContent());
         file_put_contents($this->getFile(), $content);
     }
+    
+    /**
+     * 
+     * @param string $file
+     * 
+     * @return \Daze\Entry
+     */
+    public static function load($file)
+    {
+        $content = file_get_contents($file);
+        if (0 === ($metaStart = strpos($content, '---'))) {
+            // Get meta
+            $metaEnd = strpos($content, '---', $metaStart +1);
+            $meta    = substr($content, $metaStart, $metaEnd);
+            $meta    = Yaml::parse($meta);
+            $content = substr($content, $metaEnd + 3);
+        } else {
+            $meta    = array('title' => pathinfo($file, PATHINFO_FILENAME));
+        }
+
+        $entry = new Entry($meta);
+        $entry->setContent($content);
+        
+        return $entry;
+    }
 }
