@@ -1,4 +1,4 @@
-daze
+Daze
 ====
 
-PHP Static Site Generator (like Jekyll)
+Static Site Generator (like Jekyll) written in PHP.

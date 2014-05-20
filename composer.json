@@ -1,0 +1,24 @@
+{
+    "name": "anorgan/daze",
+    "description": "Static Site Generator (like Jekyll, but for PHP)",
+    "keywords": ["daze", "static", "pages", "markdown"],
+    "type": "project",
+    "homepage": "https://github.com/anorgan/daze",
+    "authors": [
+        {"name": "Marin Crnković", "email": "marin.crnkovic@gmail.com"}
+    ],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/console": "v2.4.4",
+        "symfony/yaml": "v2.4.4",
+        "erusev/parsedown": "1.0.0",
+        "twig/twig": "v1.15.1"
+    },
+    "bin": ["daze"],
+    "autoload": {
+        "psr-4": {
+            "Daze\\": "src/"
+        }
+    }
+}

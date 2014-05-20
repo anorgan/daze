@@ -1,0 +1,20 @@
+#!/usr/bin/env php
+<?php
+
+if (!file_exists(__DIR__ . '/vendor/autoload.php')) {
+    $usage = <<<EOL
+Dependencies needed before running, install with composer:
+wget http://getcomposer.org/composer.phar
+php composer.phar install
+
+EOL;
+    die($usage);
+}
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+use Daze\Application;
+
+$app = new Application('Daze', 'v0.1.0');
+
+$app->run();
