@@ -13,7 +13,8 @@
         "symfony/console": "v2.4.4",
         "symfony/yaml": "v2.4.4",
         "erusev/parsedown": "1.0.0",
-        "twig/twig": "v1.15.1"
+        "twig/twig": "v1.15.1",
+        "symfony/routing": "v2.4.4"
     },
     "bin": ["daze"],
     "autoload": {

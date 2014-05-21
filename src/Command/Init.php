@@ -23,7 +23,7 @@ EOT
     
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->createDirectoryStructure();
+        $this->createDirectoryStructure($output);
         
         $config = $this->getApplication()->getConfig();
         
@@ -39,35 +39,50 @@ EOT
         $this->getApplication()->setConfig($config);
     }
     
-    protected function createDirectoryStructure()
+    protected function createDirectoryStructure(OutputInterface $output)
     {
         $root = $this->getApplication()->getRoot();
         $structure = array(
-            '.daze/assets',
-            '.daze/layouts',
-            '.daze/entries',
+            $this->getApplication()->getDazeRoot() .'/assets',
+            $this->getApplication()->getDazeRoot() .'/templates/daze',
+            $this->getApplication()->getDazeRoot() .'/entries',
             'css',
             'js',
             'images',
         );
         
         foreach ($structure as $path) {
-            if (is_dir($root .'/'. $path)) {
+            $path = strpos($path, '/') === 0 ? $path : $root .'/'. $path;
+            if (is_dir($path)) {
                 continue;
             }
-            mkdir($root .'/'. $path, 0755, true);
+            mkdir($path, 0755, true);
+            $output->writeln(sprintf('<info>Created directory %s</info>', $path));
         }
         
+        // Add first entry
         $entry = new \Daze\Entry();
         $entry
             ->setTitle('My First Entry')
-            ->setFile($root .'/.daze/entries/my-first-entry.md')
+            ->setFile($this->getApplication()->getDazeRoot() .'/entries/my-first-entry.md')
             ->setContent('My First Entry
 --------------
 
 This is the first entry');
         
         $entry->save();
+        
+        // Add base template
+        file_put_contents($this->getApplication()->getDazeRoot() .'/templates/daze/layout.twig', <<<EOT
+<html>
+<head>
+</head>
+<body>
+    {{ entry|render }}
+</body>
+</html>
+EOT
+        );
     }
     
 }

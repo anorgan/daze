@@ -7,11 +7,16 @@ use Symfony\Component\Yaml\Yaml;
 
 class Application extends BaseApplication
 {
-    const CONFIG_FILE = 'daze.yml';
+    const DAZE_DIR      = '.daze';
+    const CONFIG_FILE   = 'daze.yml';
+    
+    const ROUTE_ENTRY   = 'entry';
     
     protected $root;
     protected $config = array(
-        'entriesPath' => '.daze/entries'
+        'entriesPath'   => '.daze/entries',
+        'templatesPath' => '.daze/templates',
+        'template'      => 'daze'
     );
     
     /**
@@ -43,6 +48,11 @@ class Application extends BaseApplication
         return $this;
     }
     
+    public function getDazeRoot()
+    {
+        return $this->getRoot() .'/'. self::DAZE_DIR;
+    }
+
     public function getConfig()
     {
         if ($this->config === null) {
@@ -87,5 +97,46 @@ class Application extends BaseApplication
         }
 
         return $entries;
+    }
+
+    /**
+     * 
+     * @return \Symfony\Component\Routing\Generator\UrlGenerator
+     * @todo Extract to service
+     */
+    public function getRouter()
+    {
+        $routes = new \Symfony\Component\Routing\RouteCollection();
+        $routes->add(self::ROUTE_ENTRY, new \Symfony\Component\Routing\Route('/{slug}/'));
+        
+        return new \Symfony\Component\Routing\Generator\UrlGenerator($routes, new \Symfony\Component\Routing\RequestContext);
+    }
+
+    /**
+     * 
+     * @return type
+     * @todo Extract to service
+     */
+    public function getTemplate()
+    {
+        $templateName = $this->config['template'];
+        $twig = new \Twig_Environment(new \Twig_Loader_Filesystem($this->config['templatesPath']), array('autoescape' => 'html'));
+        
+        $twig->addFilter(new \Twig_SimpleFilter('render', function (Entry $entry) {
+            switch ($entry->getType()) {
+                case Entry::TYPE_MARKDOWN:
+                    $parsedown  = new \Parsedown();
+                    $html       = $parsedown->text($entry->getContent());
+
+                    break;
+                
+                default:
+                    throw new \Exception('Error while rendering entry, unknown type: '. $entry->getType());
+            }
+
+            return $html;
+        }, array('is_safe' => array('html'))));
+        
+        return $twig->loadTemplate($templateName .'/layout.twig');
     }
 }

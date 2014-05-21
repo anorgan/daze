@@ -6,6 +6,8 @@ use Symfony\Component\Yaml\Yaml;
 
 class Entry extends \ArrayObject
 {
+    const TYPE_MARKDOWN = 'md';
+
     protected $file;
     protected $content;
     
@@ -14,10 +16,17 @@ class Entry extends \ArrayObject
         $this->setFlags(self::ARRAY_AS_PROPS);
         parent::__construct($array);
     }
-    
+
     public function getTitle()
     {
         return $this->title;
+    }
+    
+    public function getSlug()
+    {
+        $urlized = strtolower(trim(preg_replace("/[^a-zA-Z0-9\/_|+ -]/", '', iconv('UTF-8', 'ASCII//TRANSLIT', $this->getTitle())), '-'));
+        $urlized = preg_replace("/[\/_|+ -]+/", '-', $urlized);
+        return trim($urlized, '-');
     }
 
     public function getContent()
@@ -39,6 +48,35 @@ class Entry extends \ArrayObject
     {
         $this->title = $title;
         return $this;
+    }
+    
+    public function isDraft()
+    {
+        return isset($this->draft) && $this->draft === true;
+    }
+
+    public function getType()
+    {
+        if (isset($this->type)) {
+            return $this->type;
+        }
+        
+        if (null === $this->getFile()) {
+            throw new \Exception('Error while getting type, type not set, and can not guess from file, which is null');
+        }
+        
+        $extension = strtolower(pathinfo($this->getFile(), PATHINFO_EXTENSION));
+        switch ($extension) {
+            case 'md':
+            case 'markdown':
+                return 'md';
+
+                break;
+            
+            default:
+                return $extension;
+                break;
+        }
     }
 
     public function setContent($content)
@@ -66,6 +104,13 @@ class Entry extends \ArrayObject
         file_put_contents($this->getFile(), $content);
     }
     
+    public function toArray()
+    {
+        $array = $this->getArrayCopy();
+        $array['slug'] = $this->getSlug();
+        return $array;
+    }
+
     /**
      * 
      * @param string $file
@@ -87,6 +132,7 @@ class Entry extends \ArrayObject
 
         $entry = new Entry($meta);
         $entry->setContent($content);
+        $entry->setFile($file);
         
         return $entry;
     }

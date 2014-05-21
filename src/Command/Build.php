@@ -30,9 +30,30 @@ EOT
     
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        /* @var $entry Entry */
         foreach ($this->getApplication()->getEntries() as $entry) {
-            print_r($entry);
+            if ($entry->isDraft()) {
+                continue;
+            }
+
+            // Get entry url, render and store
+            $url    = $this->getApplication()->getRouter()->generate(\Daze\Application::ROUTE_ENTRY, $entry->toArray());
+            $path   = $this->getApplication()->getRoot() .'/'. trim(parse_url($url, PHP_URL_PATH), '/');
+            
+            if (!file_exists($path)) {
+                mkdir($path, 0755, true);
+            }
+
+            $filename   = $path .'/index.html';
+
+            $content    = $this->getApplication()->getTemplate()->render(compact('entry'));
+
+            if (!file_put_contents($filename, $content)) {
+                throw new Exception('Error while storing entry "'. $entry->getTitle() .'" to '. $filename);
+            }
         }
+
+        // Create homepage
+        // Create tags pages
     }
-    
 }
