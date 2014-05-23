@@ -8,6 +8,8 @@ class Entry extends \ArrayObject
 {
     const TYPE_MARKDOWN = 'md';
 
+    
+    protected $application;
     protected $file;
     protected $content;
     
@@ -16,7 +18,27 @@ class Entry extends \ArrayObject
         $this->setFlags(self::ARRAY_AS_PROPS);
         parent::__construct($array);
     }
+    
+    /**
+     * 
+     * @return Application
+     */
+    public function getApplication()
+    {
+        return $this->application;
+    }
 
+    /**
+     * 
+     * @param \Daze\Application $application
+     * @return \Daze\Entry
+     */
+    public function setApplication(Application $application)
+    {
+        $this->application = $application;
+        return $this;
+    }
+    
     public function getTitle()
     {
         return $this->title;
@@ -24,9 +46,26 @@ class Entry extends \ArrayObject
     
     public function getSlug()
     {
-        $urlized = strtolower(trim(preg_replace("/[^a-zA-Z0-9\/_|+ -]/", '', iconv('UTF-8', 'ASCII//TRANSLIT', $this->getTitle())), '-'));
-        $urlized = preg_replace("/[\/_|+ -]+/", '-', $urlized);
-        return trim($urlized, '-');
+        return $this->getApplication()->urlize($this->getTitle());
+    }
+    
+    public function getCategory()
+    {
+        if (!is_array($this->category)) {
+            $flippedCategories = array_flip($this->getApplication()->getConfig()['categories']);
+            $this->category = array(
+                'slug' => $flippedCategories[$this->category],
+                'title' => $this->category
+            );
+        }
+        
+        return $this->category;
+    }
+    
+    public function getUrl()
+    {
+        $url = $this->getApplication()->getRouter()->generate(\Daze\Application::ROUTE_ENTRY, $this->toArray());
+        return '/'. trim(parse_url($url, PHP_URL_PATH), '/') .'/';
     }
 
     public function getContent()
@@ -108,6 +147,7 @@ class Entry extends \ArrayObject
     {
         $array = $this->getArrayCopy();
         $array['slug'] = $this->getSlug();
+        $array['category_slug'] = $this->getCategory()['slug'];
         return $array;
     }
 

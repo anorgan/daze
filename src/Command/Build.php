@@ -30,30 +30,71 @@ EOT
     
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $config     = $this->getApplication()->getConfig();
+        $entries    = $this->getApplication()->getEntries();
+        $categories = array();
+        $tags       = array();
+
         /* @var $entry Entry */
-        foreach ($this->getApplication()->getEntries() as $entry) {
+        foreach ($entries as $entry) {
             if ($entry->isDraft()) {
                 continue;
             }
 
+            if (isset($entry['category'])) {
+                $categories[$entry['category']][] = $entry;
+            }
+
+            if (isset($entry['tags'])) {
+                foreach ((array) $entry['tags'] as $tag) {
+                    $tags[$tag][] = $entry;
+                }
+            }
+
             // Get entry url, render and store
-            $url    = $this->getApplication()->getRouter()->generate(\Daze\Application::ROUTE_ENTRY, $entry->toArray());
-            $path   = $this->getApplication()->getRoot() .'/'. trim(parse_url($url, PHP_URL_PATH), '/');
+            $content    = $this->getApplication()->getTemplate('entry')->render(compact('entry', 'config'));
             
-            if (!file_exists($path)) {
-                mkdir($path, 0755, true);
-            }
-
-            $filename   = $path .'/index.html';
-
-            $content    = $this->getApplication()->getTemplate()->render(compact('entry'));
-
-            if (!file_put_contents($filename, $content)) {
-                throw new Exception('Error while storing entry "'. $entry->getTitle() .'" to '. $filename);
-            }
+            $this->createPage($entry->getUrl(), $content);
         }
 
         // Create homepage
+        $content    = $this->getApplication()->getTemplate('home')->render(compact('entries', 'config'));
+        $this->createPage('/', $content);
+        
+        // Create categories
+        $flippedCategories = array_flip($config['categories']);
+        foreach ($categories as $title => $entries) {
+            $slug = $flippedCategories[$title];
+
+            $url = $this->getApplication()->getRouter()->generate(\Daze\Application::ROUTE_CATEGORY, compact('slug'));
+
+            $content = $this->getApplication()->getTemplate('category')->render(compact('title', 'entries', 'config'));
+            $this->createPage($url, $content);
+        }
+
         // Create tags pages
+        foreach ($tags as $title => $entries) {
+            $slug = $this->getApplication()->urlize($title);
+
+            $url = $this->getApplication()->getRouter()->generate(\Daze\Application::ROUTE_TAG, compact('slug'));
+
+            $content = $this->getApplication()->getTemplate('tag')->render(compact('title', 'entries', 'config'));
+            $this->createPage($url, $content);
+        }
+    }
+    
+    protected function createPage($url, $content)
+    {
+        $path   = $this->getApplication()->getRoot() .'/'. trim(parse_url($url, PHP_URL_PATH), '/');
+
+        if (!file_exists($path)) {
+            mkdir($path, 0755, true);
+        }
+
+        $filename   = $path .'/index.html';
+
+        if (!file_put_contents($filename, $content)) {
+            throw new Exception('Error while creating page on path '. $filename);
+        }
     }
 }

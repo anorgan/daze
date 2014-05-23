@@ -11,13 +11,11 @@ class Application extends BaseApplication
     const CONFIG_FILE   = 'daze.yml';
     
     const ROUTE_ENTRY   = 'entry';
+    const ROUTE_CATEGORY   = 'category';
+    const ROUTE_TAG   = 'tag';
     
     protected $root;
-    protected $config = array(
-        'entriesPath'   => '.daze/entries',
-        'templatesPath' => '.daze/templates',
-        'template'      => 'daze'
-    );
+    protected $config;
     
     /**
      * @return array An array of default Command instances
@@ -56,11 +54,14 @@ class Application extends BaseApplication
     public function getConfig()
     {
         if ($this->config === null) {
+            $this->config = array(
+                'entriesPath'   => '.daze/entries',
+                'templatesPath' => '.daze/templates',
+                'template'      => 'daze'
+            );
             $configFile = $this->getRoot() .'/'. self::CONFIG_FILE;
             if (file_exists($configFile) && is_readable($configFile)) {
-                $this->config = Yaml::parse($configFile);
-            } else {
-                $this->config = array();
+                $this->config = Yaml::parse($configFile) + $this->config;
             }
         }
         
@@ -77,9 +78,17 @@ class Application extends BaseApplication
         }
     }
     
+    public function urlize($string)
+    {
+        
+        $urlized = strtolower(trim(preg_replace("/[^a-zA-Z0-9\/_|+ -]/", '', iconv('UTF-8', 'ASCII//TRANSLIT', $string)), '-'));
+        $urlized = preg_replace("/[\/_|+ -]+/", '-', $urlized);
+        return trim($urlized, '-');
+    }
+    
     public function getEntriesPath()
     {
-        return $this->getRoot() .'/'. $this->config['entriesPath'];
+        return $this->getRoot() .'/'. $this->getConfig()['entriesPath'];
     }
 
     /**
@@ -93,7 +102,9 @@ class Application extends BaseApplication
 
         $entries    = array();
         foreach ($iterator as $info) {
-            $entries[] = Entry::load($info->getPathname());
+            $entry = Entry::load($info->getPathname());
+            $entry->setApplication($this);
+            $entries[] = $entry;
         }
 
         return $entries;
@@ -107,7 +118,9 @@ class Application extends BaseApplication
     public function getRouter()
     {
         $routes = new \Symfony\Component\Routing\RouteCollection();
-        $routes->add(self::ROUTE_ENTRY, new \Symfony\Component\Routing\Route('/{slug}/'));
+        $routes->add(self::ROUTE_ENTRY, new \Symfony\Component\Routing\Route('/{category_slug}/{slug}/'));
+        $routes->add(self::ROUTE_CATEGORY, new \Symfony\Component\Routing\Route('/{slug}/'));
+        $routes->add(self::ROUTE_TAG, new \Symfony\Component\Routing\Route('/tag/{slug}/'));
         
         return new \Symfony\Component\Routing\Generator\UrlGenerator($routes, new \Symfony\Component\Routing\RequestContext);
     }
@@ -117,10 +130,10 @@ class Application extends BaseApplication
      * @return type
      * @todo Extract to service
      */
-    public function getTemplate()
+    public function getTemplate($name)
     {
-        $templateName = $this->config['template'];
-        $twig = new \Twig_Environment(new \Twig_Loader_Filesystem($this->config['templatesPath']), array('autoescape' => 'html'));
+        $templateName = $this->getConfig()['template'];
+        $twig = new \Twig_Environment(new \Twig_Loader_Filesystem($this->getConfig()['templatesPath']), array('autoescape' => 'html'));
         
         $twig->addFilter(new \Twig_SimpleFilter('render', function (Entry $entry) {
             switch ($entry->getType()) {
@@ -137,6 +150,6 @@ class Application extends BaseApplication
             return $html;
         }, array('is_safe' => array('html'))));
         
-        return $twig->loadTemplate($templateName .'/layout.twig');
+        return $twig->loadTemplate($templateName .'/'. $name .'.twig');
     }
 }
