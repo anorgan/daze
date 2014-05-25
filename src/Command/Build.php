@@ -50,6 +50,8 @@ EOT
                     $tags[$tag][] = $entry;
                 }
             }
+            
+            $output->writeln(sprintf('<info>Writing entry %s</info>', $entry->getTitle()));
 
             // Get entry url, render and store
             $content    = $this->getApplication()->getTemplate('entry')->render(compact('entry', 'config'));

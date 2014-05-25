@@ -2,6 +2,8 @@
 
 namespace Daze;
 
+use DateTime;
+use Exception;
 use Symfony\Component\Yaml\Yaml;
 
 class Entry extends \ArrayObject
@@ -46,7 +48,35 @@ class Entry extends \ArrayObject
     
     public function getSlug()
     {
-        return $this->getApplication()->urlize($this->getTitle());
+        if (!isset($this->slug) || null === $this->slug) {
+            $this->slug = $this->getApplication()->urlize($this->getTitle());
+        }
+        return $this->slug;
+    }
+
+    /**
+     * 
+     * @return DateTime
+     * @throws Exception
+     */
+    public function getDate()
+    {
+        if (!isset($this->date)) {
+            // No date set; get last modified time and save it
+            $dateTime = DateTime::createFromFormat('U', filemtime($this->getFile()));
+            $this->date = $dateTime->format('Y-m-j');
+            $this->save();
+        }
+
+        if (is_numeric($this->date)) {
+            $this->date = DateTime::createFromFormat('U', $this->date);
+        } elseif (is_string($this->date)) {
+            $this->date = DateTime::createFromFormat('Y-m-j', $this->date);
+        } elseif (!($this->date instanceof DateTime)) {
+            throw new Exception('Error getting date, can not create DateTime object from '. $this->date);
+        }
+
+        return $this->date;
     }
     
     public function getCategory()
@@ -71,11 +101,6 @@ class Entry extends \ArrayObject
     public function getContent()
     {
         return $this->content;
-    }
-
-    public function getMeta()
-    {
-        return $this->meta;
     }
 
     public function getFile()
@@ -124,12 +149,6 @@ class Entry extends \ArrayObject
         return $this;
     }
 
-    public function setMeta($meta)
-    {
-        $this->meta = $meta;
-        return $this;
-    }
-
     public function setFile($file)
     {
         $this->file = $file;
@@ -147,6 +166,7 @@ class Entry extends \ArrayObject
     {
         $array = $this->getArrayCopy();
         $array['slug'] = $this->getSlug();
+        $array['date'] = $this->getDate();
         $array['category_slug'] = $this->getCategory()['slug'];
         return $array;
     }
@@ -170,7 +190,7 @@ class Entry extends \ArrayObject
             $meta    = array('title' => pathinfo($file, PATHINFO_FILENAME));
         }
 
-        $entry = new Entry($meta);
+        $entry = new \Daze\Entry($meta);
         $entry->setContent($content);
         $entry->setFile($file);
         

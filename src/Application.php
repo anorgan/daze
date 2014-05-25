@@ -150,6 +150,8 @@ class Application extends BaseApplication
             return $html;
         }, array('is_safe' => array('html'))));
         
+        $twig->addFilter(new \Twig_SimpleFilter('urlize', array($this, 'urlize'), array('is_safe' => array('html'))));
+        
         return $twig->loadTemplate($templateName .'/'. $name .'.twig');
     }
 }
