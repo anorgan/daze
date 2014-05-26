@@ -9,6 +9,7 @@ use Symfony\Component\Yaml\Yaml;
 class Entry extends \ArrayObject
 {
     const TYPE_MARKDOWN = 'md';
+    const TYPE_HTML     = 'html';
 
     
     protected $application;
@@ -133,9 +134,13 @@ class Entry extends \ArrayObject
         switch ($extension) {
             case 'md':
             case 'markdown':
-                return 'md';
+                return self::TYPE_MARKDOWN;
 
                 break;
+            
+            case 'htm':
+            case 'html':
+                return self::TYPE_HTML;
             
             default:
                 return $extension;

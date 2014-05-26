@@ -10,9 +10,10 @@ class Application extends BaseApplication
     const DAZE_DIR      = '.daze';
     const CONFIG_FILE   = 'daze.yml';
     
-    const ROUTE_ENTRY   = 'entry';
-    const ROUTE_CATEGORY   = 'category';
-    const ROUTE_TAG   = 'tag';
+    const ROUTE_HOME        = 'home';
+    const ROUTE_ENTRY       = 'entry';
+    const ROUTE_CATEGORY    = 'category';
+    const ROUTE_TAG         = 'tag';
     
     protected $root;
     protected $config;
@@ -26,6 +27,7 @@ class Application extends BaseApplication
 
         $commands[] = new Command\Init();
         $commands[] = new Command\Build();
+        $commands[] = new Command\CreateEntry();
 
         return $commands;
     }
@@ -117,10 +119,13 @@ class Application extends BaseApplication
      */
     public function getRouter()
     {
+        $baseUrl = isset($this->getConfig()['baseUrl']) ? rtrim($this->getConfig()['baseUrl'], '/') : '';
+
         $routes = new \Symfony\Component\Routing\RouteCollection();
-        $routes->add(self::ROUTE_ENTRY, new \Symfony\Component\Routing\Route('/{category_slug}/{slug}/'));
-        $routes->add(self::ROUTE_CATEGORY, new \Symfony\Component\Routing\Route('/{slug}/'));
-        $routes->add(self::ROUTE_TAG, new \Symfony\Component\Routing\Route('/tag/{slug}/'));
+        $routes->add(self::ROUTE_HOME, new \Symfony\Component\Routing\Route($baseUrl .'/'));
+        $routes->add(self::ROUTE_ENTRY, new \Symfony\Component\Routing\Route($baseUrl .'/{category_slug}/{slug}/'));
+        $routes->add(self::ROUTE_CATEGORY, new \Symfony\Component\Routing\Route($baseUrl .'/{slug}/'));
+        $routes->add(self::ROUTE_TAG, new \Symfony\Component\Routing\Route($baseUrl .'/tag/{slug}/'));
         
         return new \Symfony\Component\Routing\Generator\UrlGenerator($routes, new \Symfony\Component\Routing\RequestContext);
     }
@@ -142,6 +147,11 @@ class Application extends BaseApplication
                     $html       = $parsedown->text($entry->getContent());
 
                     break;
+
+                case Entry::TYPE_HTML:
+                    $html       = $entry->getContent();
+                    
+                    break;
                 
                 default:
                     throw new \Exception('Error while rendering entry, unknown type: '. $entry->getType());
@@ -151,6 +161,10 @@ class Application extends BaseApplication
         }, array('is_safe' => array('html'))));
         
         $twig->addFilter(new \Twig_SimpleFilter('urlize', array($this, 'urlize'), array('is_safe' => array('html'))));
+        $app = $this;
+        $twig->addFunction(new \Twig_SimpleFunction('url', function($name, $parameters = array()) use ($app) {
+            return $this->getRouter()->generate($name, $parameters);
+        }));
         
         return $twig->loadTemplate($templateName .'/'. $name .'.twig');
     }

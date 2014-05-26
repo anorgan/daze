@@ -2,12 +2,13 @@
 
 namespace Daze\Command;
 
+use Daze\Application;
+use Daze\Command\Command;
 use Daze\Entry;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+
 
 class Build extends Command
 {
@@ -68,7 +69,7 @@ EOT
         foreach ($categories as $title => $entries) {
             $slug = $flippedCategories[$title];
 
-            $url = $this->getApplication()->getRouter()->generate(\Daze\Application::ROUTE_CATEGORY, compact('slug'));
+            $url = $this->getApplication()->getRouter()->generate(Application::ROUTE_CATEGORY, compact('slug'));
 
             $content = $this->getApplication()->getTemplate('category')->render(compact('title', 'entries', 'config'));
             $this->createPage($url, $content);
@@ -78,25 +79,10 @@ EOT
         foreach ($tags as $title => $entries) {
             $slug = $this->getApplication()->urlize($title);
 
-            $url = $this->getApplication()->getRouter()->generate(\Daze\Application::ROUTE_TAG, compact('slug'));
+            $url = $this->getApplication()->getRouter()->generate(Application::ROUTE_TAG, compact('slug'));
 
             $content = $this->getApplication()->getTemplate('tag')->render(compact('title', 'entries', 'config'));
             $this->createPage($url, $content);
-        }
-    }
-    
-    protected function createPage($url, $content)
-    {
-        $path   = $this->getApplication()->getRoot() .'/'. trim(parse_url($url, PHP_URL_PATH), '/');
-
-        if (!file_exists($path)) {
-            mkdir($path, 0755, true);
-        }
-
-        $filename   = $path .'/index.html';
-
-        if (!file_put_contents($filename, $content)) {
-            throw new Exception('Error while creating page on path '. $filename);
         }
     }
 }
