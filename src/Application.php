@@ -137,35 +137,7 @@ class Application extends BaseApplication
      */
     public function getTemplate($name)
     {
-        $templateName = $this->getConfig()['template'];
-        $twig = new \Twig_Environment(new \Twig_Loader_Filesystem($this->getConfig()['templatesPath']), array('autoescape' => 'html'));
-        
-        $twig->addFilter(new \Twig_SimpleFilter('render', function (Entry $entry) {
-            switch ($entry->getType()) {
-                case Entry::TYPE_MARKDOWN:
-                    $parsedown  = new \Parsedown();
-                    $html       = $parsedown->text($entry->getContent());
-
-                    break;
-
-                case Entry::TYPE_HTML:
-                    $html       = $entry->getContent();
-                    
-                    break;
-                
-                default:
-                    throw new \Exception('Error while rendering entry, unknown type: '. $entry->getType());
-            }
-
-            return $html;
-        }, array('is_safe' => array('html'))));
-        
-        $twig->addFilter(new \Twig_SimpleFilter('urlize', array($this, 'urlize'), array('is_safe' => array('html'))));
-        $app = $this;
-        $twig->addFunction(new \Twig_SimpleFunction('url', function($name, $parameters = array()) use ($app) {
-            return $this->getRouter()->generate($name, $parameters);
-        }));
-        
-        return $twig->loadTemplate($templateName .'/'. $name .'.twig');
+        $template = new Template($this->getConfig()['templatesPath'], $this->getConfig()['template'] .'/'. $name);
+        return $template->get();
     }
 }

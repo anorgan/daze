@@ -26,24 +26,28 @@ EOT
         $entry = new Entry();
         $entry->setApplication($this->getApplication());
 
-        $entry->setTitle($this->dialog->ask($output, 'Title of entry: '));
-        $possibleTypes = array(Entry::TYPE_HTML, Entry::TYPE_MARKDOWN);
-        $type = $this->dialog->askAndValidate($output, 'Type <info>['. Entry::TYPE_MARKDOWN .']<info>: ', function($answer) use ($possibleTypes) {
-            if (!in_array($answer, $possibleTypes)) {
-                throw new \RuntimeException('Type not supported, possible types are: '. implode(', ', $possibleTypes));
-            }
-            return $answer;
-        }, false, Entry::TYPE_MARKDOWN, $possibleTypes);
+        $entry->setTitle($this->required($output, 'Title of entry: '));
+
+        $possibleTypes = array(Entry::TYPE_MARKDOWN => 'Markdown', Entry::TYPE_HTML => 'Pure, raw HTML');
+        $type = $this->select($output, 'Select type: ', $possibleTypes, self::DEFAULT_FIRST_CHOICE);
+
+        $categories = array_values($config['categories']);
+        $categoryId = $this->select($output, 'Category: ', $categories, self::DEFAULT_FIRST_CHOICE);
+        $entry->category = $categories[$categoryId];
         
-        $categories = $config['categories'];
-        $entry->category = $this->dialog->askAndValidate($output, 'Category <info>['.reset($categories).']</info>: ', function($answer) use($categories) {
-            if (!in_array($answer, $categories)) {
-                throw new \RuntimeException('Pick one of the categories: '. implode(PHP_EOL, $categories));
-            }
-            return $answer;
-        }, false, reset($categories), $categories);
-        $entry->setFile($this->getApplication()->getDazeRoot() .'/entries/'. $entry->getSlug() .'.'. $type);
-        $entry->setContent('# '. $entry->getTitle() . PHP_EOL);
+        $entry->setFile($this->getApplication()->getEntriesPath() .'/'. $entry->getSlug() .'.'. $type);
+        
+        switch ($type) {
+            case Entry::TYPE_HTML:
+                $entry->setContent('<h2>'. $entry->getTitle() .'</h2>'. PHP_EOL);
+                
+                break;
+            case Entry::TYPE_MARKDOWN:
+                $entry->setContent('# '. $entry->getTitle() . PHP_EOL);
+                
+                break;
+        }
+
         $entry->save();
         
         $output->writeln('New entry has been created at <info>'. $entry->getFile() .'</info>');

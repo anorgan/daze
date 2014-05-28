@@ -2,11 +2,9 @@
 
 namespace Daze\Command;
 
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\DialogHelper;
+use Daze\Entry;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Yaml\Yaml;
 
 class Init extends Command
 {
@@ -27,14 +25,11 @@ EOT
         
         $config = $this->getApplication()->getConfig();
         
-        /* @var $dialog DialogHelper */
-        $dialog = $this->getHelper('dialog');
-        
         if (!isset($config['title'])) {
             $config['title'] = ucwords(str_replace(array('-', '_'), ' ', basename($this->getApplication()->getRoot())));
         }
 
-        $config['title'] = $dialog->ask($output, 'Your new site title <info>['. $config['title'] .']<info>: ', $config['title']);
+        $config['title'] = $this->dialog->ask($output, 'Your new site title <info>['. $config['title'] .']<info>: ', $config['title']);
 
         $this->getApplication()->setConfig($config);
     }
@@ -61,10 +56,10 @@ EOT
         }
         
         // Add first entry
-        $entry = new \Daze\Entry();
+        $entry = new Entry();
         $entry
             ->setTitle('My First Entry')
-            ->setFile($this->getApplication()->getDazeRoot() .'/entries/my-first-entry.md')
+            ->setFile($this->getApplication()->getEntriesPath() .'/my-first-entry.md')
             ->setContent('My First Entry
 --------------
 
