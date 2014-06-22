@@ -2,7 +2,14 @@
 
 namespace Daze;
 
+use Daze\Command\Build;
+use Daze\Command\CreateEntry;
+use Daze\Command\Init;
 use Symfony\Component\Console\Application as BaseApplication;
+use Symfony\Component\Routing\Generator\UrlGenerator;
+use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Yaml\Yaml;
 
 class Application extends BaseApplication
@@ -25,9 +32,9 @@ class Application extends BaseApplication
     {
         $commands = parent::getDefaultCommands();
 
-        $commands[] = new Command\Init();
-        $commands[] = new Command\Build();
-        $commands[] = new Command\CreateEntry();
+        $commands[] = new Init();
+        $commands[] = new Build();
+        $commands[] = new CreateEntry();
 
         return $commands;
     }
@@ -58,8 +65,8 @@ class Application extends BaseApplication
         if ($this->config === null) {
             $this->config = array(
                 'entriesPath'   => '.daze/entries',
-                'templatesPath' => '.daze/templates',
-                'template'      => 'daze'
+                'themesPath'    => '.daze/themes',
+                'theme'         => 'daze'
             );
             $configFile = $this->getRoot() .'/'. self::CONFIG_FILE;
             if (file_exists($configFile) && is_readable($configFile)) {
@@ -93,9 +100,17 @@ class Application extends BaseApplication
         return $this->getRoot() .'/'. $this->getConfig()['entriesPath'];
     }
 
+    public function getTypes()
+    {
+        return array(
+            Entry::TYPE_MARKDOWN => 'Markdown', 
+            Entry::TYPE_HTML => 'Pure, raw HTML'
+        );
+    }
+
     /**
      * 
-     * @return Entry[]
+     * @return \Daze\Entry[]
      */
     public function getEntries()
     {
@@ -104,30 +119,61 @@ class Application extends BaseApplication
 
         $entries    = array();
         foreach ($iterator as $info) {
-            $entry = Entry::load($info->getPathname());
+            if (!array_key_exists(strtolower($info->getExtension()), $this->getTypes())) {
+                continue;
+            }
+            $entry = \Daze\Entry::load($info->getPathname());
             $entry->setApplication($this);
             $entries[] = $entry;
         }
+        
+        usort($entries, function(\Daze\Entry $entryA, \Daze\Entry $entryB) {
+            $dateA = $entryA->getDate()->getTimestamp();
+            $dateB = $entryB->getDate()->getTimestamp();
+            if ($dateA === $dateB) {
+                return 0;
+            }
+            
+            return $dateA > $dateB ? -1 : +1;
+        });
 
         return $entries;
     }
 
     /**
      * 
-     * @return \Symfony\Component\Routing\Generator\UrlGenerator
+     * @return UrlGenerator
      * @todo Extract to service
      */
     public function getRouter()
     {
         $baseUrl = isset($this->getConfig()['baseUrl']) ? rtrim($this->getConfig()['baseUrl'], '/') : '';
-
-        $routes = new \Symfony\Component\Routing\RouteCollection();
-        $routes->add(self::ROUTE_HOME, new \Symfony\Component\Routing\Route($baseUrl .'/'));
-        $routes->add(self::ROUTE_ENTRY, new \Symfony\Component\Routing\Route($baseUrl .'/{category_slug}/{slug}/'));
-        $routes->add(self::ROUTE_CATEGORY, new \Symfony\Component\Routing\Route($baseUrl .'/{slug}/'));
-        $routes->add(self::ROUTE_TAG, new \Symfony\Component\Routing\Route($baseUrl .'/tag/{slug}/'));
         
-        return new \Symfony\Component\Routing\Generator\UrlGenerator($routes, new \Symfony\Component\Routing\RequestContext);
+        $routesConfig = isset($this->getConfig()['routes']) ? $this->getConfig()['routes'] : array();
+        
+        if (!isset($routesConfig[self::ROUTE_HOME])) {
+            $routesConfig[self::ROUTE_HOME] = '/';
+        }
+        
+        if (!isset($routesConfig[self::ROUTE_ENTRY])) {
+            $routesConfig[self::ROUTE_ENTRY] = '/{category_slug}/{slug}/';
+        }
+        
+        if (!isset($routesConfig[self::ROUTE_CATEGORY])) {
+            $routesConfig[self::ROUTE_CATEGORY] = '/{slug}/';
+        }
+        
+        if (!isset($routesConfig[self::ROUTE_TAG])) {
+            $routesConfig[self::ROUTE_TAG] = '/tag/{slug}/';
+        }
+
+        $routes = new RouteCollection();
+        $routes->add(self::ROUTE_HOME,      new Route($baseUrl . $routesConfig[self::ROUTE_HOME]));
+        $routes->add(self::ROUTE_ENTRY,     new Route($baseUrl . $routesConfig[self::ROUTE_ENTRY]));
+        $routes->add(self::ROUTE_CATEGORY,  new Route($baseUrl . $routesConfig[self::ROUTE_CATEGORY]));
+        $routes->add(self::ROUTE_TAG,       new Route($baseUrl . $routesConfig[self::ROUTE_TAG]));
+        
+        return new UrlGenerator($routes, new RequestContext);
     }
 
     /**
@@ -137,7 +183,7 @@ class Application extends BaseApplication
      */
     public function getTemplate($name)
     {
-        $template = new Template($this->getConfig()['templatesPath'], $this->getConfig()['template'] .'/'. $name);
+        $template = new \Daze\Template($this->getConfig()['themesPath'], $this->getConfig()['theme'] .'/'. $name);
         return $template->get();
     }
 }

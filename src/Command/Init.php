@@ -38,8 +38,7 @@ EOT
     {
         $root = $this->getApplication()->getRoot();
         $structure = array(
-            $this->getApplication()->getDazeRoot() .'/assets',
-            $this->getApplication()->getDazeRoot() .'/templates/daze',
+            $this->getApplication()->getDazeRoot() .'/themes/daze',
             $this->getApplication()->getDazeRoot() .'/entries',
             'css',
             'js',
@@ -68,7 +67,7 @@ This is the first entry');
         $entry->save();
         
         // Add base template
-        file_put_contents($this->getApplication()->getDazeRoot() .'/templates/daze/layout.twig', <<<EOT
+        file_put_contents($this->getApplication()->getDazeRoot() .'/themes/daze/layout.twig', <<<EOT
 <html>
 <head>
 </head>

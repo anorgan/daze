@@ -82,6 +82,10 @@ class Entry extends \ArrayObject
     
     public function getCategory()
     {
+        if (!isset($this->category)) {
+            return null;
+        }
+        
         if (!is_array($this->category)) {
             $flippedCategories = array_flip($this->getApplication()->getConfig()['categories']);
             $this->category = array(

@@ -61,7 +61,9 @@ class Template
                 return $app->getRouter()->generate($name, $parameters);
             }));
 
+            $this->twig->addGlobal('app', new Application);
         }
+
         return $this->twig;
     }
 

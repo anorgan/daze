@@ -28,13 +28,16 @@ EOT
 
         $entry->setTitle($this->required($output, 'Title of entry: '));
 
-        $possibleTypes = array(Entry::TYPE_MARKDOWN => 'Markdown', Entry::TYPE_HTML => 'Pure, raw HTML');
+        $possibleTypes = $this->getApplication->getTypes();
+
         $type = $this->select($output, 'Select type: ', $possibleTypes, self::DEFAULT_FIRST_CHOICE);
 
-        $categories = array_values($config['categories']);
-        $categoryId = $this->select($output, 'Category: ', $categories, self::DEFAULT_FIRST_CHOICE);
-        $entry->category = $categories[$categoryId];
-        
+        if (isset($config['categories'])) {
+            $categories = array_values($config['categories']);
+            $categoryId = $this->select($output, 'Category: ', $categories, self::DEFAULT_FIRST_CHOICE);
+            $entry->category = $categories[$categoryId];
+        }
+
         $entry->setFile($this->getApplication()->getEntriesPath() .'/'. $entry->getSlug() .'.'. $type);
         
         switch ($type) {
