@@ -86,12 +86,13 @@ class Command extends BaseCommand
 
     protected function createPage($url, $content)
     {
-        $config = $this->getApplication()->getConfig();
-        $baseUrl = isset($config['baseUrl']) ? rtrim($config['baseUrl'], '/') : '';
+        $config     = $this->getApplication()->getConfig();
+        $baseUrl    = isset($config['baseUrl']) ? rtrim($config['baseUrl'], '/') : '';
+        $url        = trim($url, '/');
         if (strlen($baseUrl) && strpos($url, $baseUrl) === 0) {
             $url = str_replace($baseUrl, '', $url);
         }
-        $path   = $this->getApplication()->getRoot() .'/'. trim(parse_url($url, PHP_URL_PATH), '/');
+        $path   = $this->getApplication()->getRoot() .'/'. parse_url($url, PHP_URL_PATH);
 
         if (!file_exists($path)) {
             mkdir($path, 0755, true);

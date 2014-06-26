@@ -60,7 +60,7 @@ EOT
 
             // Get entry url, render and store
             $content    = $this->getApplication()->getTemplate('entry')->render(compact('entry', 'config'));
-            
+
             $this->createPage($entry->getUrl(), $content);
         }
 
