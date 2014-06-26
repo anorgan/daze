@@ -1,40 +1,115 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Daze Documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/assets/daze/css/style.css" rel="stylesheet">
+    <link href="/css/prism.css" rel="stylesheet">
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
 
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
-
-    <title>Daze by anorgan</title>
-  </head>
-
-  <body>
-
-    <header>
-      <div class="container">
-        <h1>Daze</h1>
-        <h2>PHP Static Site Generator (like Jekyll)</h2>
-
-        <section id="downloads">
-          <a href="https://github.com/anorgan/daze/zipball/master" class="btn">Download as .zip</a>
-          <a href="https://github.com/anorgan/daze/tarball/master" class="btn">Download as .tar.gz</a>
-          <a href="https://github.com/anorgan/daze" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
-        </section>
-      </div>
-    </header>
-
-    <div class="container">
-      <section id="main_content">
-        <h1>
-<a name="daze" class="anchor" href="#daze"><span class="octicon octicon-link"></span></a>Daze</h1>
-
-<p>Static Site Generator (like Jekyll) written in PHP.</p>
-      </section>
+    <!-- Fixed navbar -->
+    <div class="navbar navbar-default" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">Daze Documentation</a>
+            </div>
+        </div>
     </div>
 
-    
-  </body>
+    <div class="container">
+            <div class="row">
+        <div class="col-sm-8">
+                                    
+            <div class="entry">
+                <h1 id="about" class="entry-title">About</h1>
+                                
+                <p>Daze is a static site builder, similar to Jekyll and others. It uses files written in Markdown or HTML to create static HTML pages.</p>
+<p>Using Themes, Daze can create personal blogs, project documentation or what ever else you can think of.</p>
+            </div>
+                        
+            <div class="entry">
+                <h1 id="installation" class="entry-title">Installation</h1>
+                                
+                <p>To install, you can download prebuilt phar archive or require anorgan/daze in composer. Preferred way of installing is phar:</p>
+<pre><code class="language-bash">$ mkdir my-cool-site &amp;&amp; cd my-cool-site
+$ wget http://anorgan.github.io/daze/daze.phar</code></pre>
+<p>To start, initialize your Daze site:</p>
+<pre><code class="language-bash">$ php daze.phar init</code></pre>
+<p>Daze holds all its data in <code>.daze</code> folder (unless your configuration is different), which makes it easy to git ignore it and commit all the files for "production". You can then keep <code>.daze/entries</code> in a separate branch for versioning purposes.</p>
+            </div>
+                        
+            <div class="entry">
+                <h1 id="configuration" class="entry-title">Configuration</h1>
+                                
+                <p>Daze doesn't have a lot of mandatory configuration. On the other hand, everything is configurable and this are the options:</p>
+<h2><code>daze.yml</code></h2>
+<pre><code class="language-yml">entriesPath: _entries
+themesPath: .daze/themes
+routes:
+    entry: /{slug}/
+theme: daze
+title: 'Daze Documentation'</code></pre>
+            </div>
+                        
+            <div class="entry">
+                <h1 id="building" class="entry-title">Building</h1>
+                                
+                <p>To create your site, you have to take all your entries and transform them to static pages. To do that, issue the <code>build</code> command:</p>
+<pre><code class="language-bash">$ php daze.phar build</code></pre>
+<p>After it is done, you will be able to surf the site. To do that, I recommend setting up Apache/nginx or running PHP standalone server:</p>
+<pre><code class="language-bash">$ php -S localhost:8888 -t .</code></pre>
+<p>To watch for changes... bla... bla... inotify</p>
+            </div>
+                        
+            <div class="entry">
+                <h1 id="writing-entries" class="entry-title">Writing Entries</h1>
+                                
+                <p>Just like in Jekyll, entries are written with Front Matter - a YAML configuration at the start of the file, inside three dashes:</p>
+<pre><code>---
+title: This is the configuration
+slug: of-the-file
+date: 2014-07-05
+draft: true
+---
+Now we can write some *Markdown* or &lt;strong&gt;HTML&lt;/strong&gt;.</code></pre>
+<p>To ease the creation, there is a <code>create:entry</code> command, which will ask you a couple of questions and create the file for you:</p>
+<pre><code class="language-bash">$ php daze.phar create:entry
+Title of entry: Some test entry
+Select type: 
+  [md  ] Markdown (default)
+  [html] Pure, raw HTML
+&gt; html
+New entry has been created at /path/to/my-cool-site/.daze/entries/some-test-entry.html</code></pre>
+            </div>
+                        
+            <div class="entry">
+                <h1 id="themes" class="entry-title">Themes</h1>
+                                
+                <p><em>This feature is not done yet</em></p>
+<p>Themes give your site look and feel, but also they define your content architecture. Some themes display all entries chronologically on homepage, while other are more suitable for documentation or other tree structured content.</p>
+            </div>
+                    </div>
+    </div>
+    </div>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script src="/assets/daze/js/app.js"></script>
+    <script src="/js/prism.js"></script>
+</body>
 </html>

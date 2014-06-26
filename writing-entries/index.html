@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Writing Entries - Daze Documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/assets/daze/css/style.css" rel="stylesheet">
+    <link href="/css/prism.css" rel="stylesheet">
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+
+    <!-- Fixed navbar -->
+    <div class="navbar navbar-default" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">Daze Documentation</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+            <p>Just like in Jekyll, entries are written with Front Matter - a YAML configuration at the start of the file, inside three dashes:</p>
+<pre><code>---
+title: This is the configuration
+slug: of-the-file
+date: 2014-07-05
+draft: true
+---
+Now we can write some *Markdown* or &lt;strong&gt;HTML&lt;/strong&gt;.</code></pre>
+<p>To ease the creation, there is a <code>create:entry</code> command, which will ask you a couple of questions and create the file for you:</p>
+<pre><code class="language-bash">$ php daze.phar create:entry
+Title of entry: Some test entry
+Select type: 
+  [md  ] Markdown (default)
+  [html] Pure, raw HTML
+&gt; html
+New entry has been created at /path/to/my-cool-site/.daze/entries/some-test-entry.html</code></pre>
+    
+    <ul>
+            </ul>
+    </div>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script src="/assets/daze/js/app.js"></script>
+    <script src="/js/prism.js"></script>
+</body>
+</html>

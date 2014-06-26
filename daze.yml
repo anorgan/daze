@@ -1,0 +1,6 @@
+entriesPath: _entries
+themesPath: .daze/themes
+routes:
+    entry: /{slug}/
+theme: daze
+title: 'Daze Documentation'
