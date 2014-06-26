@@ -1,5 +1,6 @@
 entriesPath: _entries
 themesPath: .daze/themes
+baseUrl: daze/
 routes:
     entry: /{slug}/
 theme: daze
