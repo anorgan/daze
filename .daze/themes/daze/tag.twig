@@ -1,0 +1,14 @@
+{% extends 'daze/layout.twig' %}
+
+{% block body %}
+    <h1>Tag: {{ title }}</h1>
+
+    <h2>Entries</h2>
+    <ul>
+        {% for entry in entries %}
+            <li>
+                <a href="{{ url('entry', {category_slug: entry.category.slug, slug: entry.slug}) }}">{{ entry.title }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

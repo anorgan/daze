@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{% block title %}{{ config.title }}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url('home') }}assets/daze/css/style.css" rel="stylesheet">
+    <link href="{{ url('home') }}css/prism.css" rel="stylesheet">
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+
+    <div class="navbar navbar-default" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{{ url('home') }}">{{ config.title }}</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <ul class="col-md-3 nav nav-pills nav-stacked">
+                {% for entry in app.entries|reverse if not entry.isDraft %}
+                    <li{{ entry.slug == activeEntry.slug ? ' class="active"' : null }}>
+                        <a href="{{ url('entry', {slug: entry.slug}) }}">{{ entry.title }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+            <div class="col-md-8 nav">
+                {% block body %}{% endblock%}
+            </div>
+        </div>
+    </div>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script src="{{ url('home') }}assets/daze/js/app.js"></script>
+    <script src="{{ url('home') }}js/prism.js"></script>
+</body>
+</html>

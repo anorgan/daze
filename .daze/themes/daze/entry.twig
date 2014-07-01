@@ -1,0 +1,16 @@
+{% extends 'daze/layout.twig' %}
+{% set activeEntry = entry %}
+{% block title %}{{ entry.title }} - {{ parent() }}{% endblock %}
+
+{% block body %}
+    <h1>{{ entry.title }}</h1>
+    {{ entry|render }}
+    
+    {% if entry.tags %}
+    <ul>
+        {% for tag in entry.tags %}
+        <li><a href="{{ url('tag', {slug: tag|urlize}) }}">{{ tag }}</a></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+{% endblock %}
