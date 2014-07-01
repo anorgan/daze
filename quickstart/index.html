@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Themes - Daze Documentation</title>
+    <title>Quickstart - Daze Documentation</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
@@ -33,6 +33,9 @@
     <div class="container">
         <div class="row">
             <ul class="col-md-3 nav nav-pills nav-stacked">
+                                    <li class="active">
+                        <a href="/quickstart/">Quickstart</a>
+                    </li>
                                     <li>
                         <a href="/about/">About</a>
                     </li>
@@ -48,14 +51,33 @@
                                     <li>
                         <a href="/writing-entries/">Writing Entries</a>
                     </li>
-                                    <li class="active">
+                                    <li>
                         <a href="/themes/">Themes</a>
+                    </li>
+                                    <li>
+                        <a href="/my-first-entry/">My First Entry</a>
                     </li>
                             </ul>
             <div class="col-md-8 nav">
-                    <h1>Themes</h1>
-    <p><em>This feature is not done yet</em></p>
-<p>Themes give your site look and feel, but also they define your content architecture. Some themes display all entries chronologically on homepage, while other are more suitable for documentation or other tree structured content.</p>
+                    <h1>Quickstart</h1>
+    <pre><code class="language-bash">$ mkdir my-cool-site &amp;&amp; cd my-cool-site
+my-cool-site $ wget http://anorgan.github.io/daze/daze.phar
+my-cool-site $ php daze.phar init
+Your new site title [My Cool Site]:
+# You can now edit daze.yml, to change the title and other configuration
+
+# Create new entry
+my-cool-site $ php daze.phar create:entry
+Title of entry: Hello, Daze!
+Select type: 
+  [md  ] Markdown (default)
+  [html] Pure, raw HTML
+&gt; md
+New entry has been created at /path/to/entries/hello-daze.md
+
+# After editing hello-daze.md
+my-cool-site $ php daze.phar build
+Writing entry Hello, Daze!</code></pre>
     
                 </div>
         </div>

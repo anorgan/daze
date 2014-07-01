@@ -7,8 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/daze/assets/daze/css/style.css" rel="stylesheet">
-    <link href="/daze/css/prism.css" rel="stylesheet">
+    <link href="/assets/daze/css/style.css" rel="stylesheet">
+    <link href="/css/prism.css" rel="stylesheet">
     <!--[if lt IE 9]>
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
@@ -16,7 +16,6 @@
 </head>
 <body>
 
-    <!-- Fixed navbar -->
     <div class="navbar navbar-default" role="navigation">
         <div class="container">
             <div class="navbar-header">
@@ -26,13 +25,36 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="/daze/">Daze Documentation</a>
+                <a class="navbar-brand" href="/">Daze Documentation</a>
             </div>
         </div>
     </div>
 
     <div class="container">
-            <p>Just like in Jekyll, entries are written with Front Matter - a YAML configuration at the start of the file, inside three dashes:</p>
+        <div class="row">
+            <ul class="col-md-3 nav nav-pills nav-stacked">
+                                    <li>
+                        <a href="/about/">About</a>
+                    </li>
+                                    <li>
+                        <a href="/installation/">Installation</a>
+                    </li>
+                                    <li>
+                        <a href="/configuration/">Configuration</a>
+                    </li>
+                                    <li>
+                        <a href="/building/">Building</a>
+                    </li>
+                                    <li class="active">
+                        <a href="/writing-entries/">Writing Entries</a>
+                    </li>
+                                    <li>
+                        <a href="/themes/">Themes</a>
+                    </li>
+                            </ul>
+            <div class="col-md-8 nav">
+                    <h1>Writing Entries</h1>
+    <p>Just like in Jekyll, entries are written with Front Matter - a YAML configuration at the start of the file, inside three dashes:</p>
 <pre><code>---
 title: This is the configuration
 slug: of-the-file
@@ -49,13 +71,13 @@ Select type:
 &gt; html
 New entry has been created at /path/to/my-cool-site/.daze/entries/some-test-entry.html</code></pre>
     
-    <ul>
-            </ul>
+                </div>
+        </div>
     </div>
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-    <script src="/daze/assets/daze/js/app.js"></script>
-    <script src="/daze/js/prism.js"></script>
+    <script src="/assets/daze/js/app.js"></script>
+    <script src="/js/prism.js"></script>
 </body>
 </html>
