@@ -124,10 +124,10 @@ class Application extends BaseApplication
             }
             $entry = \Daze\Entry::load($info->getPathname());
             $entry->setApplication($this);
-            $entries[] = $entry;
+            $entries[$entry->getSlug()] = $entry;
         }
         
-        usort($entries, function(\Daze\Entry $entryA, \Daze\Entry $entryB) {
+        uasort($entries, function(\Daze\Entry $entryA, \Daze\Entry $entryB) {
             $dateA = $entryA->getDate()->getTimestamp();
             $dateB = $entryB->getDate()->getTimestamp();
             if ($dateA === $dateB) {

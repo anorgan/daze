@@ -28,7 +28,7 @@ EOT
 
         $entry->setTitle($this->required($output, 'Title of entry: '));
 
-        $possibleTypes = $this->getApplication->getTypes();
+        $possibleTypes = $this->getApplication()->getTypes();
 
         $type = $this->select($output, 'Select type: ', $possibleTypes, self::DEFAULT_FIRST_CHOICE);
 

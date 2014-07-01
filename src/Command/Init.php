@@ -21,6 +21,10 @@ EOT
     
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if (file_exists($this->getApplication()->getRoot() .'/'. \Daze\Application::CONFIG_FILE)) {
+            throw new \Exception('Daze already initialized. Delete contents, or '. \Daze\Application::CONFIG_FILE .' to start over');
+        }
+
         $this->createDirectoryStructure($output);
         
         $config = $this->getApplication()->getConfig();
