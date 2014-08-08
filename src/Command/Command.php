@@ -101,7 +101,7 @@ class Command extends BaseCommand
         $filename   = $path .'/index.html';
 
         if (!file_put_contents($filename, $content)) {
-            throw new Exception('Error while creating page on path '. $filename);
+            throw new \Exception('Error while creating page on path '. $filename);
         }
     }
 }
